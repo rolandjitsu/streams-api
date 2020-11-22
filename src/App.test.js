@@ -1,13 +1,17 @@
 import {
   act,
+  cleanup,
   render,
   screen,
   waitFor
 } from '@testing-library/react';
-const fetchMock = require('fetch-mock');
+import fetchMock from 'fetch-mock-jest';
 import App from './App';
 
-afterEach(() => fetchMock.reset());
+afterEach(async () => {
+  fetchMock.reset();
+  await cleanup();
+});
 
 test('renders 0 when no counter', () => {
   render(<App />);
@@ -16,9 +20,9 @@ test('renders 0 when no counter', () => {
 });
 
 test('renders whatever the counter sends', async () => {
-  // Seems like passing stream to new Response() doesn't work;
-  // so we need to set the body
   const response = new Response();
+  // NOTE: This is a hack; we should pass the stream
+  // to the Response (not supported yet).
   response.body = new ReadableStream({
     start(ctrl) {
       ctrl.enqueue(JSON.stringify({count: 1}));
@@ -26,10 +30,7 @@ test('renders whatever the counter sends', async () => {
     }
   });
 
-  fetchMock.once('*', null, {
-    response,
-    sendAsJson: false
-  });
+  fetchMock.once('*', null, {response});
 
   const ui = (<App url="/counter" />);
   const {rerender} = render(ui);
