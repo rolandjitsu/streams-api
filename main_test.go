@@ -21,7 +21,6 @@ func TestGetAvengers(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/avengers?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	c.SetParamNames()
 
 	if assert.NoError(t, getAvengers(c)) {
 		assert.Equal(t, `{"character":"Iron Man","name":"Anthony Edward 'Tony' Stark","founder":true}
@@ -33,19 +32,44 @@ func TestGetAvengers(t *testing.T) {
 	}
 }
 
+func TestGetAvengersContextCancel(t *testing.T) {
+	e := echo.New()
+	ctx, cancel := context.WithCancel(context.Background())
+	q := make(url.Values)
+	q.Set("delay", "100ms")
+
+	req := httptest.NewRequest(http.MethodGet, "/avengers?"+q.Encode(), nil)
+	req = req.WithContext(ctx)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	go func() {
+		time.Sleep(30 * time.Millisecond)
+		cancel()
+	}()
+
+	err := getAvengers(c)
+	assert.NoError(t, err)
+	// Should have cancelled gracefully before sending all avengers
+	assert.Contains(t, rec.Body.String(), `{"character":"Iron Man"`)
+	assert.NotContains(t, rec.Body.String(), `{"character":"Hulk"`)
+}
+
 func TestGetCounter(t *testing.T) {
 	e := echo.New()
 
 	ctx, cancel := context.WithCancel(context.Background())
-	req := httptest.NewRequest(http.MethodGet, "/counter", nil)
+	q := make(url.Values)
+	q.Set("delay", "10ms")
+
+	req := httptest.NewRequest(http.MethodGet, "/counter?"+q.Encode(), nil)
 	req = req.WithContext(ctx)
 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	c.SetParamNames()
 
 	go func() {
-		time.Sleep(1500 * time.Millisecond)
+		time.Sleep(15 * time.Millisecond)
 		cancel()
 	}()
 
@@ -65,7 +89,6 @@ func TestGetCounterMax(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/counter?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	c.SetParamNames()
 
 	if assert.NoError(t, getCounter(c)) {
 		assert.Equal(t, `{"count":0}
@@ -80,4 +103,24 @@ func TestGetCounterMax(t *testing.T) {
 {"count":9}
 `, rec.Body.String())
 	}
+}
+
+func TestGetCounterInvalidParams(t *testing.T) {
+	e := echo.New()
+
+	// Invalid delay
+	q := make(url.Values)
+	q.Set("delay", "invalid")
+	req := httptest.NewRequest(http.MethodGet, "/counter?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	assert.Error(t, getCounter(c))
+
+	// Invalid max
+	q = make(url.Values)
+	q.Set("max", "notanumber")
+	req = httptest.NewRequest(http.MethodGet, "/counter?"+q.Encode(), nil)
+	rec = httptest.NewRecorder()
+	c = e.NewContext(req, rec)
+	assert.Error(t, getCounter(c))
 }

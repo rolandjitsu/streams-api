@@ -1,4 +1,5 @@
 name: Test
+
 on:
   push:
     branches:
@@ -8,21 +9,26 @@ on:
 
 jobs:
   test-api:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: "^1.15.2"
-      - name: Run tests
-        run: go test -count=1 .
+          go-version-file: 'go.mod'
+      - name: Run Go tests
+        run: go test -v -count=1 .
+
   test-ui:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 12.x
-      - run: yarn install --pure-lockfile
-      - name: Run tests
-        run: yarn test:cov
+          node-version: 22.x
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run UI tests
+        run: npm test
+      - name: Build UI
+        run: npm run build
