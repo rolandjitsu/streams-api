@@ -7,8 +7,6 @@
 Companion project for the blog post:
 **[The Streams API in JavaScript and Go](https://rolandsdev.blog/posts/the-streams-api-in-javascript-and-go/)** on Roland's Dev Blog.
 
----
-
 ## Features
 
 - **Chunked HTTP Streaming**: Go backend writes and flushes JSON chunks incrementally over a single HTTP connection without buffering.
@@ -17,8 +15,6 @@ Companion project for the blog post:
 - **Interactive Demos**:
   - **Counter Stream (`/counter`)**: Real-time continuous metric stream with configurable delay and max values.
   - **Avengers Stream (`/avengers`)**: Progressive list hydration where structured hero objects appear on screen as each chunk arrives.
-
----
 
 ## Server (Go)
 
@@ -58,8 +54,6 @@ go test -coverprofile=coverage.out .
 go tool cover -html=coverage.out
 ```
 
----
-
 ## Client (React + Vite)
 
 The frontend is built with **React 18** and bundled with **Vite**.
@@ -87,8 +81,6 @@ npm run test:cov
 ```bash
 npm run build
 ```
-
----
 
 ## License
 
