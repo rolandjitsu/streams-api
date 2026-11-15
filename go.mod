@@ -3,7 +3,7 @@ module github.com/rolandjitsu/streams-api
 go 1.26.0
 
 require (
-	github.com/labstack/echo/v4 v4.13.3
+	github.com/labstack/echo/v4 v4.16.5
 	github.com/stretchr/testify v1.12.1
 )
 
