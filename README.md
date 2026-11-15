@@ -2,7 +2,7 @@
 
 > A full-stack example demonstrating HTTP streaming with the browser [Streams API](https://developer.mozilla.org/en-US/docs/Web/API/Streams_API), [react-fetch-streams](https://github.com/rolandjitsu/react-fetch-streams), and a [Go](https://golang.org/) backend using [Echo](https://echo.labstack.com/).
 
-[![Test](https://img.shields.io/github/actions/workflow/status/rolandjitsu/streams-api/test.yml?branch=master&label=tests&style=flat-square)](https://github.com/rolandjitsu/streams-api/actions/workflows/test.yml)
+[![Test](https://img.shields.io/github/actions/workflow/status/rolandjitsu/streams-api/test.yml?branch=main&label=tests&style=flat-square)](https://github.com/rolandjitsu/streams-api/actions/workflows/test.yml)
 
 Companion project for the blog post:
 **[The Streams API in JavaScript and Go](https://rolandsdev.blog/posts/the-streams-api-in-javascript-and-go/)** on Roland's Dev Blog.
